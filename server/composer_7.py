@@ -376,7 +376,9 @@ class ImageComposer7:
             # Conditions bar
             if pos < hours:
                 color = BLACK
-                if conditions["uv"]:
+                if conditions["uv"] > 2:
+                    color = YELLOW
+                if conditions["uv"] > 5:
                     color = ORANGE
                 if conditions["uv"] > 7:
                     color = RED
