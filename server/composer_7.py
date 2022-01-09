@@ -73,6 +73,27 @@ class ImageComposer7:
                 self.draw_moonphase(context)
             else:
                 self.draw_stats(context)
+
+            d = datetime.date.today()
+            wd = d.weekday()
+            text = ""
+            if wd == 0: text = "3.15pm"
+            elif wd == 1: text = "4.30pm"
+            elif wd == 2: text = "3.15pm"
+            elif wd == 3: text = "4.30pm"
+            elif wd == 4: text = "4.30pm"
+
+            if text:
+                text_width = self.draw_text(context, text, size=20, weight="bold", noop=True)
+                left = 502
+                top = 265
+                self.draw_roundrect(context, left, top, text_width + 15, 30, 4)
+                context.set_source_rgb(*GREEN)
+                context.fill()
+                self.draw_text(
+                    context, position=(left+8, top+23), text=text, color=WHITE, size=20, weight="bold"
+                )
+
             # Save out as bytestream
             output = BytesIO()
             surface.write_to_png(output)
@@ -467,20 +488,20 @@ class ImageComposer7:
         import ephem, unicodedata
         d = datetime.date.today()
         phases = [
-            (ephem.next_new_moon(d).datetime().date(), 'new_moon'),
+            (ephem.next_new_moon(d).datetime().date(), 'new'),
             (ephem.next_first_quarter_moon(d).datetime().date(), 'first_quarter'),
-            (ephem.next_full_moon(d).datetime().date(), 'full_moon'),
+            (ephem.next_full_moon(d).datetime().date(), 'full'),
             (ephem.next_last_quarter_moon(d).datetime().date(), 'last_quarter'),
         ]
         phases.sort()
         phase = phases[0]
         if phase[0] == d:
             phase = phase[1]
-        elif phase[1] == 'new_moon':
+        elif phase[1] == 'new':
             phase = 'waning_crescent'
         elif phase[1] == 'first_quarter':
             phase = 'waxing_crescent'
-        elif phase[1] == 'full_moon':
+        elif phase[1] == 'full':
             phase = 'waxing_gibbous'
         elif phase[1] == 'last_quarter':
             phase = 'waning_gibbous'
