@@ -127,6 +127,16 @@ class ImageComposer7:
             weight="bold",
         )
 
+    def parse_time(self, t):
+        try:
+            exp = datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%SZ')
+        except ValueError:
+            try:
+                exp = datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S+01:00')
+            except ValueError:
+                exp = datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S+01') # ???
+        return exp
+
     def draw_transport(self, context: cairo.Context):
         self.draw_icon(context, "bus", (408, 7))
         self.draw_icon(context, "train", (530, 7))
@@ -158,10 +168,10 @@ class ImageComposer7:
         ]
         for i, row in enumerate(nxt):
             if row['ExpectedArrival']:
-                exp = datetime.datetime.strptime(row['ExpectedArrival'], '%Y-%m-%dT%H:%M:%SZ')
+                exp = self.parse_time(row['ExpectedArrival'])
                 bus_col = BLACK
             else:
-                exp = datetime.datetime.strptime(row['ScheduledArrival'], '%Y-%m-%dT%H:%M:%SZ')
+                exp = self.parse_time(row['ScheduledArrival'])
                 bus_col = GREY
             exp = f"{exp.strftime('%H:%M')}"
             self.draw_text(context, text=exp, color=bus_col, align="center", **places[i])
