@@ -135,7 +135,7 @@ class ImageComposer7:
 
         # Scheduled
         bus = requests.get(f'https://bustimes.org/stops/{self.wm["stop_id"]}/times.json').json()
-        nxt = bus['times'][:3]
+        nxt = bus['times']
         nxt = [{"ExpectedArrival":"", "ScheduledArrival": f["aimed_departure_time"]} for f in nxt]
 
         # Live
@@ -147,7 +147,9 @@ class ImageComposer7:
         nxt = [n for n in nxt if n['ScheduledArrival'] not in scheduled_live]
 
         nxt += bus
-        nxt = sorted(nxt, key=lambda x: x['ExpectedArrival'] or x['ScheduledArrival'])[:3]
+        nxt = sorted(nxt, key=lambda x: x['ExpectedArrival'] or x['ScheduledArrival'])
+        soon = (datetime.datetime.now() + datetime.timedelta(minutes=10)).strftime("%Y-%m-%dT%H:%M")
+        nxt = [row for row in nxt if ((row['ExpectedArrival'] or row['ScheduledArrival']) >= soon)][:3]
 
         places = [
             {"position":(420,70), "size":36, "weight":"bold"},
@@ -165,7 +167,9 @@ class ImageComposer7:
             self.draw_text(context, text=exp, color=bus_col, align="center", **places[i])
 
         train = requests.get('https://traintimes.org.uk/live/brv/bhm').text
-        m = re.findall("<tr[^>]*><td[^>]*>(\d\d:\d\d)<br>(?:<span class='faded'|<span class='important'>(\d\d:\d\d))", train)[:3]
+        m = re.findall("<tr[^>]*><td[^>]*>(\d\d:\d\d)<br>(?:<span class='faded'|<span class='important'>(\d\d:\d\d))", train)
+        soon = (datetime.datetime.now() + datetime.timedelta(minutes=15)).strftime("%H:%M")
+        m = [row for row in m if ((row[1] or row[0]) >= soon)][:3]
         places = [
             {"position":(542,70), "size":36, "weight": "bold"},
             {"position":(517,94), "size":16},
